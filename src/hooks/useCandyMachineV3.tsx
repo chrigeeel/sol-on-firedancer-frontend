@@ -387,6 +387,9 @@ export default function useCandyMachineV3(
 				//   remaining: x.remaining - nfts.length,
 				//   redeemed: x.redeemed + nfts.length,
 				// }));
+				setStatus((x) => ({ ...x, minting: false }));
+				refresh();
+				return nfts.filter((a) => a);
 			} catch (error: any) {
 				let message = error.msg || "Minting failed! Please try again!";
 				if (!error.msg) {
@@ -405,12 +408,10 @@ export default function useCandyMachineV3(
 						message = `Minting period hasn't started yet.`;
 					}
 				}
-				console.error(error);
-				throw new Error(message);
-			} finally {
+				console.error(error, "throwing error");
 				setStatus((x) => ({ ...x, minting: false }));
 				refresh();
-				return nfts.filter((a) => a);
+				throw new Error(message);
 			}
 		},
 		[

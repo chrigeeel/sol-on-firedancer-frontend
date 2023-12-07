@@ -456,21 +456,37 @@ const Home = (props: HomeProps) => {
 
 			console.log({ nftGuards });
 			// debugger;
+			try {
+				const items = await candyMachineV3.mint(quantityString, {
+					groupLabel: guardLabel,
+					nftGuards,
+				});
+
+				console.log("then rached");
+				setMintedItems(items as any);
+			} catch (e) {
+				console.log(e, "err reached");
+				setAlertState({
+					open: true,
+					message: e.message,
+					severity: "error",
+				});
+			}
+
+			/*
 			candyMachineV3
 				.mint(quantityString, {
 					groupLabel: guardLabel,
 					nftGuards,
 				})
 				.then((items) => {
+					console.log("then rached");
 					setMintedItems(items as any);
 				})
-				.catch((e) =>
-					setAlertState({
-						open: true,
-						message: e.message,
-						severity: "error",
-					})
-				);
+				.catch((e) => {
+					console.log(e, "setting alert state");
+				});
+        */
 		},
 		[candyMachineV3.mint, guards]
 	);
