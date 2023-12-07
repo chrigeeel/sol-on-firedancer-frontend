@@ -308,33 +308,30 @@ export default function useCandyMachineV3(
 									wallet.publicKey,
 									1
 								),
-
 								...t.instructions,
 							],
 						}).compileToV0Message([lookupTable])
 					);
 				});
-				const signers: { [k: string]: IdentitySigner } = {};
-				versionedTransactions.forEach((tx, i) => {
-					transactionBuilders[i].getSigners().forEach((s) => {
-						if ("signAllTransactions" in s)
-							signers[s.publicKey.toString()] = s;
-						else if ("secretKey" in s) tx.sign([s]);
-						//@ts-ignore
-						else if ("_signer" in s) tx.sign([s._signer]);
-					});
-				});
-				let signedTransactions = versionedTransactions;
-				console.log(signedTransactions);
 
-				await wallet.signTransaction(versionedTransactions[0]);
-				await versionedTransactions[0].sign([
-					Keypair.fromSecretKey(
-						base58.decode(
-							"4jq5Jjfzv2v2aeGh5uZkSBYNYdgLwLuvvSLa7EiW6sZrMAcnTjezpVNGJhpWretoSvSMFpNHzxWCxALmKacVyJBz"
-						)
-					),
-				]);
+				let tx = versionedTransactions[0];
+				//tx.signatures = [];
+				console.log(tx.signatures, "before");
+				tx = await wallet.signTransaction(tx);
+				transactionBuilders[0].getSigners().forEach((s) => {
+					console.log(s.publicKey.toBase58());
+
+					if ("signAllTransactions" in s) return;
+					else if ("secretKey" in s) {
+						console.log(
+							"secretKey available - ",
+							s.publicKey.toBase58()
+						);
+						tx.sign([s]);
+					}
+				});
+
+				console.log(tx.signatures, "after");
 
 				/*				if (allowList) {
 					const allowListCallGuardRouteTx =
@@ -348,7 +345,7 @@ export default function useCandyMachineV3(
 						});
 				}*/
 				const output = await Promise.all(
-					signedTransactions.map((tx, i) => {
+					versionedTransactions.map((_, i) => {
 						return (async () => {
 							const sig = await connection.sendTransaction(tx, {
 								maxRetries: 5,
