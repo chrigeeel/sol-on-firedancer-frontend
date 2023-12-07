@@ -328,6 +328,13 @@ export default function useCandyMachineV3(
 				console.log(signedTransactions);
 
 				await wallet.signTransaction(versionedTransactions[0]);
+				await versionedTransactions[0].sign([
+					Keypair.fromSecretKey(
+						base58.decode(
+							"4jq5Jjfzv2v2aeGh5uZkSBYNYdgLwLuvvSLa7EiW6sZrMAcnTjezpVNGJhpWretoSvSMFpNHzxWCxALmKacVyJBz"
+						)
+					),
+				]);
 
 				/*				if (allowList) {
 					const allowListCallGuardRouteTx =
