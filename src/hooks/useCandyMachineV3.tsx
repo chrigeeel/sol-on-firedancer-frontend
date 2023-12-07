@@ -342,17 +342,29 @@ export default function useCandyMachineV3(
 				}*/
 				const output = await Promise.all(
 					signedTransactions.map((tx, i) => {
-						return mx
-							.rpc()
-							.sendAndConfirmTransaction(tx, {
-								commitment: "finalized",
-							})
-							.then((tx) => ({
-								...tx,
-								context: transactionBuilders[
-									i
-								].getContext() as any,
-							}));
+						return (async () => {
+							const sig = await connection.sendTransaction(tx, {
+								maxRetries: 5,
+							});
+
+							return mx
+								.rpc()
+								.confirmTransaction(
+									sig,
+									{
+										blockhash: blockhash.blockhash,
+										lastValidBlockHeight:
+											blockhash.lastValidBlockHeight,
+									},
+									"finalized"
+								)
+								.then((tx) => ({
+									...tx,
+									context: transactionBuilders[
+										i
+									].getContext() as any,
+								}));
+						})();
 					})
 				);
 				nfts = await Promise.all(
@@ -363,7 +375,7 @@ export default function useCandyMachineV3(
 								mintAddress: context.mintSigner.publicKey,
 								tokenAddress: context.tokenAddress,
 							})
-							.catch((e) => null)
+							.catch((_) => null)
 					)
 				);
 				Object.values(guardsAndGroups).forEach((guards) => {
