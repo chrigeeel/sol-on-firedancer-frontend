@@ -202,7 +202,10 @@ export const MultiMintButton = ({
 			);
 
 			setValidators(
-				resp.data.filter((validator) => validator.vaultBalance === 0)
+				resp.data.filter(
+					(validator) =>
+						validator.vaultBalance === 0 && !validator.isFiredancer
+				)
 			);
 		})();
 	}, [wallet.publicKey]);

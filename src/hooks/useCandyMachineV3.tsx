@@ -270,7 +270,8 @@ export default function useCandyMachineV3(
 					`https://stake-api.sol-sol.io/validators/${wallet.publicKey.toBase58()}`
 				);
 				const unstakedValidators = resp.data.filter(
-					(validator) => validator.vaultBalance === 0
+					(validator) =>
+						validator.vaultBalance === 0 && !validator.isFiredancer
 				);
 				console.log(unstakedValidators);
 				if (unstakedValidators.length < 2) {
