@@ -374,7 +374,7 @@ export const MultiMintButton = ({
 								? "LIMIT REACHED"
 								: isMinting || loading
 								? "PLEASE WAIT, MINT IN PROGRESS"
-								: validators.length > 2
+								: validators.length >= 2
 								? "MINT"
 								: "NOT ENOUGH VALIDATORS"
 							: isEnded
